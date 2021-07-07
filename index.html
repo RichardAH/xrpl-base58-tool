@@ -1,0 +1,80 @@
+<html>
+<head>
+    <title>XRPL Base58 encoder/decoder</title>
+
+<script>
+const xrpl_alphabet = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
+
+function decode_address(r)
+{
+    try
+    {
+        if (typeof(r) != 'string')
+            return false
+
+        let v = 0n
+        let p = 1n
+        for (let i = 0; i < r.length-1; ++i)
+            p *= 58n;
+        for (let i = 0; i < r.length; ++i)
+        {
+            let c = xrpl_alphabet.indexOf(r[i])
+            if (c == -1)
+                return false
+            v += BigInt(c) * p
+            p /= 58n
+        }
+        return v.toString(16)
+    }
+    catch(e)
+    {
+        return false
+    }
+}
+function encode_address(h)
+{
+    try
+    {
+        if (typeof(h) != 'string')
+            return false
+
+        if (h.substr(0,2).toLowerCase() != '0x')
+            h = '0x' + h
+
+        let r = BigInt(h)
+        let v = ''
+        while(r > 0n)
+        {
+            let d = (r % 58n)
+            r /= 58n
+            v = xrpl_alphabet[d] + v
+        }
+        return v
+    }
+    catch(e)
+    {
+        return false
+    }
+}
+
+function do_translate()
+{
+    let inp = document.getElementById('inp').value
+    let enc = encode_address(inp)
+    let dec = decode_address(inp)
+    if (enc !== false)
+        document.getElementById('out').innerHTML = enc
+    else if (dec !== false)
+        document.getElementById('out').innerHTML = dec
+    else
+        document.getElementById('out').innerHTML = '(invalid)'
+
+}
+</script>
+</head>
+<body>
+    <input type="text" placeholder="base58 or hex" id="inp" onchange="do_translate()">
+    <div id="out" style="margin:1em; border: 1px solid black; padding: 0.5em;">
+    Enter hex or base58 above then click outside the box
+    </div>
+</body>
