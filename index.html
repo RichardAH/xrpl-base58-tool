@@ -16,6 +16,11 @@
         {
             border: 1px solid lime;
         }
+        
+        div#out3
+        {
+            border: 1px solid DodgerBlue;
+        }
 
         div::before
         {
@@ -40,7 +45,14 @@
         {
             content: "raw content";
             color: red;
-        };         
+        };
+
+        div#out3::before
+        {
+            content: "c-style array";
+            color: blue;
+        };
+
     </style>
 <script>
 const xrpl_alphabet = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
@@ -104,19 +116,26 @@ function do_translate()
     let dec = decode_address(inp)
     if (enc !== false)
     {
-        document.getElementById('out').innerHTML = enc;
+        document.getElementById('out').innerText = enc;
+        document.getElementById('out2').innerText = '-';
+        document.getElementById('out3').innerText = '-';
     }
     else if (dec !== false)
     {
-        document.getElementById('out').innerHTML = dec;
-        document.getElementById('out2').innerHTML =
+        document.getElementById('out').innerText = dec;
+        document.getElementById('out2').innerText =
                 inp.substr(0,1) == 'r' ? dec.substr(0, dec.length - 8) :
                 "(not an r-address)";
+        let tohex = dec.length % 2 == 1 ? '0' + dec : dec;
+        tohex = tohex.replaceAll(/../g, (a,b)=>{return '0x' + b + 'U,'})
+        tohex = tohex.substr(0, tohex.length - 1);
+        document.getElementById('out3').innerText = tohex;
     }
     else
     {
-        document.getElementById('out').innerHTML = '(invalid)';
-        document.getElementById('out2').innerHTML = '-';
+        document.getElementById('out').innerText = '(invalid)';
+        document.getElementById('out2').innerText = '-';
+        document.getElementById('out3').innerText = '-';
     }
 
 }
@@ -128,6 +147,9 @@ function do_translate()
     Enter hex or base58 above then click outside the box
     </div>
     <div id="out2">
+        -
+    </div>
+    <div id="out3">
         -
     </div>
 </body>
