@@ -1,7 +1,47 @@
 <html>
 <head>
     <title>XRPL Base58 encoder/decoder</title>
+    <style>
+        html {
+            font-family: monospace;
+        }
 
+        div {
+            margin: 1em;
+            padding: 0.5em;
+            padding-left: 12em;
+        }
+
+        div#out2
+        {
+            border: 1px solid lime;
+        }
+
+        div::before
+        {
+            transform: translateX(-11.5em);
+            font-style: italic;
+            display: inline;
+            position: absolute;
+            opacity: .5;    
+        }
+
+        div#out2::before
+        {
+            content: "without checksum";
+        }
+
+        div#out
+        {
+            border: 1px solid red;
+        }
+
+        div#out::before
+        {
+            content: "raw content";
+            color: red;
+        };         
+    </style>
 <script>
 const xrpl_alphabet = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
 
@@ -63,18 +103,31 @@ function do_translate()
     let enc = encode_address(inp)
     let dec = decode_address(inp)
     if (enc !== false)
-        document.getElementById('out').innerHTML = enc
+    {
+        document.getElementById('out').innerHTML = enc;
+    }
     else if (dec !== false)
-        document.getElementById('out').innerHTML = dec
+    {
+        document.getElementById('out').innerHTML = dec;
+        document.getElementById('out2').innerHTML =
+                inp.substr(0,1) == 'r' ? dec.substr(0, dec.length - 8) :
+                "(not an r-address)";
+    }
     else
-        document.getElementById('out').innerHTML = '(invalid)'
+    {
+        document.getElementById('out').innerHTML = '(invalid)';
+        document.getElementById('out2').innerHTML = '-';
+    }
 
 }
 </script>
 </head>
 <body>
     <input type="text" placeholder="base58 or hex" id="inp" onchange="do_translate()">
-    <div id="out" style="margin:1em; border: 1px solid black; padding: 0.5em;">
+    <div id="out">
     Enter hex or base58 above then click outside the box
+    </div>
+    <div id="out2">
+        -
     </div>
 </body>
