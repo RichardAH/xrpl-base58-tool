@@ -10,6 +10,7 @@
             margin: 1em;
             padding: 0.5em;
             padding-left: 12em;
+            overflow-wrap: break-word;
         }
         
         div::before
@@ -49,7 +50,7 @@
         
         div#out3::before
         {
-            content: "c-array w/ cksum";
+            content: "c-array";
             color: blue;
         }
 
@@ -146,27 +147,31 @@ function do_translate()
     
     if (dec !== false)
     {
+        if (dec.length % 2 == 1) dec = '0' + dec;
+        dec = dec.toUpperCase();
         document.getElementById('out').innerText = dec;
-        document.getElementById('out2').innerText =
-                inp.substr(0,1) == 'r' ? dec.substr(0, dec.length - 8) :
-                "(not an r-address)";
-        let tohex = dec.length % 2 == 1 ? '0' + dec : dec;
+        let deckort = dec.substr(0, dec.length - 8);
+        if (deckort != '')
+            document.getElementById('out2').innerText =
+                    inp.substr(0,1) == 'r' ? deckort :
+                    "(not an r-address)";
        
         let carray1 = '';
         let carray2 = '';
-        for (let i = 0; i < tohex.length; i+=2)
+        for (let i = 0; i < dec.length; i+=2)
         {
-            let b =  '0x' + tohex.substr(i, 2) + 'U' + (i != tohex.length - 2 ? ',' : '');
+            let b =  '0x' + dec.substr(i, 2) + 'U' + (i != dec.length - 2 ? ',' : '');
             carray1 += b;
-            if (i < tohex.length - 8)
+            if (i < dec.length - 8)
                 carray2 += b;
         }
 
         if (carray1 != '')
-            document.getElementById('out3').innerText = carray1;
+                document.getElementById('out3').innerText = '{' + carray1 + '}';
 
-        if (carray2 != '')
-            document.getElementById('out4').innerText = carray2;
+        if (carray2 != '' && deckort != '')
+                document.getElementById('out4').innerText = 
+                    '{' + carray2.substr(0, carray2.length-1) + '}';
         return;
     }
 }
