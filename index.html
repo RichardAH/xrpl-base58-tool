@@ -5,23 +5,13 @@
         html {
             font-family: monospace;
         }
-
+        
         div {
             margin: 1em;
             padding: 0.5em;
             padding-left: 12em;
         }
-
-        div#out2
-        {
-            border: 1px solid lime;
-        }
         
-        div#out3
-        {
-            border: 1px solid DodgerBlue;
-        }
-
         div::before
         {
             transform: translateX(-11.5em);
@@ -30,12 +20,7 @@
             position: absolute;
             opacity: .5;    
         }
-
-        div#out2::before
-        {
-            content: "without checksum";
-        }
-
+        
         div#out
         {
             border: 1px solid red;
@@ -47,11 +32,42 @@
             color: red;
         }
 
+        div#out2
+        {
+            border: 1px solid #8bc34a;
+        }
+        
+        div#out2::before
+        {
+            content: "without checksum";
+        }
+        
+        div#out3
+        {
+            border: 1px solid DodgerBlue;
+        }
+        
         div#out3::before
         {
-            content: "c-style array";
+            content: "c-array w/ cksum";
             color: blue;
         }
+
+
+        div#out4
+        {
+            border: 1px solid #ff9800;
+        }
+        
+        div#out4::before
+        {
+            content: "c-array no cksum";
+            color: #ff5722;
+        }
+
+
+
+
     </style>
 <script>
 const xrpl_alphabet = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
@@ -110,45 +126,69 @@ function encode_address(h)
 
 function do_translate()
 {
-    let inp = document.getElementById('inp').value
+    let inp = document.getElementById('inp').value.trim()
     let enc = encode_address(inp)
     let dec = decode_address(inp)
+        
+    document.getElementById('out').innerText = '(invalid)';
+    document.getElementById('out2').innerText = '-';
+    document.getElementById('out3').innerText = '-';
+    document.getElementById('out4').innerText = '-';
+
+    if (inp.length == 0)
+            return;
+
     if (enc !== false)
     {
         document.getElementById('out').innerText = enc;
-        document.getElementById('out2').innerText = '-';
-        document.getElementById('out3').innerText = '-';
+        return;
     }
-    else if (dec !== false)
+    
+    if (dec !== false)
     {
         document.getElementById('out').innerText = dec;
         document.getElementById('out2').innerText =
                 inp.substr(0,1) == 'r' ? dec.substr(0, dec.length - 8) :
                 "(not an r-address)";
         let tohex = dec.length % 2 == 1 ? '0' + dec : dec;
-        tohex = tohex.replaceAll(/../g, (a,b)=>{return '0x' + b + 'U,'})
-        tohex = tohex.substr(0, tohex.length - 1);
-        document.getElementById('out3').innerText = tohex;
-    }
-    else
-    {
-        document.getElementById('out').innerText = '(invalid)';
-        document.getElementById('out2').innerText = '-';
-        document.getElementById('out3').innerText = '-';
-    }
+       
+        let carray1 = '';
+        let carray2 = '';
+        for (let i = 0; i < tohex.length; i+=2)
+        {
+            let b =  '0x' + tohex.substr(i, 2) + 'U' + (i != tohex.length - 2 ? ',' : '');
+            carray1 += b;
+            if (i < tohex.length - 8)
+                carray2 += b;
+        }
 
+        if (carray1 != '')
+            document.getElementById('out3').innerText = carray1;
+
+        if (carray2 != '')
+            document.getElementById('out4').innerText = carray2;
+        return;
+    }
 }
 </script>
 </head>
 <body>
-    <input type="text" placeholder="base58 or hex" id="inp" onchange="do_translate()">
+    <input type="text" placeholder=" 👉 enter base58/r-address or hex here then click outside the box" id="inp" onchange="do_translate()" size="40" style="
+        font-size: 1.5em;
+        font-family: monospace;
+        margin-left: 0.75em;
+        width: calc(100% - 1.5em);
+    " autofocus="">    
     <div id="out">
-    Enter hex or base58 above then click outside the box
+        -
+    </div>
+    <div id="out3">
+        -
     </div>
     <div id="out2">
         -
     </div>
-    <div id="out3">
+    <div id="out4">
         -
     </div>
 </body>
